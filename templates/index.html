@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pico Weather Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>Pico W Weather Dashboard</h1>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Temperature</h2>
+        <p>{{ data.temperature }} °C</p>
+    </div>
+
+    <div class="card">
+        <h2>Humidity</h2>
+        <p>{{ data.humidity }} %</p>
+    </div>
+
+    <div class="card">
+        <h2>Pressure</h2>
+        <p>{{ data.pressure }} hPa</p>
+    </div>
+
+</div>
+
+</body>
+</html>
