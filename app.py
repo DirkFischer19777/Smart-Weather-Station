@@ -1,33 +1,54 @@
 from flask import Flask, render_template
 import requests
 import time
+from data_models import db, start_background_collector
+import os
 
 app = Flask(__name__)
 
-# URL of your Raspberry Pi Pico W webserver
+# ------------------- DATABASE CONFIG -------------------
+# Ensure /data folder exists
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+
+# Database file path (absolute path prevents SQLite errors)
+db_path = os.path.join(DATA_DIR, "weather.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+
+# Tabellen einmalig erzeugen
+with app.app_context():
+    db.create_all()
+
+
+# ------------------- PICO DATA FETCHING -------------------
 PICO_URL = "http://192.168.178.115/"
 
 def get_pico_data(retries=3, timeout=5):
-    """Try fetching JSON from the Pico. Return dict with keys temperature, humidity, pressure or None values on error."""
+    """Try fetching JSON from the Pico. Return dict with temperature, humidity, pressure."""
     headers = {"Connection": "close", "Accept": "application/json, text/plain"}
+
     for attempt in range(1, retries + 1):
         try:
             resp = requests.get(PICO_URL, headers=headers, timeout=timeout)
             resp.raise_for_status()
 
-            # Try to parse JSON first. If Pico returns plain HTML, try to extract numbers defensively.
+            # Try normal JSON parse
             try:
                 data = resp.json()
             except ValueError:
-                # fallback: look at plain text and try to parse numbers (useful for debugging)
+                # fallback: try extract JSON from HTML or plain text
                 text = resp.text
                 app.logger.debug("Pico returned non-JSON response: %s", text[:200])
-                # If the Pico returns JSON-like string inside HTML, try to find it:
+
                 import re
                 m = re.search(r'\{.*"temperature".*\}', text, flags=re.S)
                 if m:
+                    import json
                     try:
-                        import json
                         data = json.loads(m.group(0))
                     except Exception:
                         data = {}
@@ -46,8 +67,14 @@ def get_pico_data(retries=3, timeout=5):
             last_error = e
             time.sleep(0.3)
 
-    # after retries, return error info
-    return {"temperature": None, "humidity": None, "pressure": None, "error": str(last_error)}
+    # Rückgabe bei Fehlern
+    return {
+        "temperature": None,
+        "humidity": None,
+        "pressure": None,
+        "error": str(last_error)
+    }
+
 
 def try_float(x):
     try:
@@ -57,11 +84,18 @@ def try_float(x):
     except Exception:
         return None
 
+
+# ------------------- ROUTES -------------------
 @app.route("/")
 def index():
     sensor_data = get_pico_data()
     return render_template("index.html", data=sensor_data)
 
+
+# ------------------- MAIN ENTRY -------------------
 if __name__ == "__main__":
-    # Run on 0.0.0.0 if you want to access this from other devices; default 127.0.0.1 is fine for local dev.
+    # Startet den Hintergrund-Thread für die Daten-Speicherung
+    start_background_collector(app, get_pico_data, interval=10)
+
+    # Starte lokalen Server
     app.run(host="127.0.0.1", port=5001, debug=True)
