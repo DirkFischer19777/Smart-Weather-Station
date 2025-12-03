@@ -92,10 +92,44 @@ def index():
     return render_template("index.html", data=sensor_data)
 
 
+@app.route("/api/history")
+def api_history():
+    from data_models import Weather
+
+    rows = Weather.query.order_by(Weather.id.desc()).limit(10).all()
+
+    # umkehren, damit älteste oben stehen
+    rows = list(reversed(rows))
+
+    return {
+        "history": [
+            {
+                "timestamp": row.timestamp.strftime("%H:%M:%S"),
+                "temperature": row.temperature,
+                "humidity": row.humidity,
+                "pressure": row.pressure,
+            }
+            for row in rows
+        ]
+    }
+
+
+@app.route("/api/current")
+def api_current():
+    data = get_pico_data()
+    return {
+        "temperature": data["temperature"],
+        "humidity": data["humidity"],
+        "pressure": data["pressure"]
+    }
+
+
+
 # ------------------- MAIN ENTRY -------------------
 if __name__ == "__main__":
-    # Startet den Hintergrund-Thread für die Daten-Speicherung
-    start_background_collector(app, get_pico_data, interval=10)
+    # Nur starten, wenn NICHT im Debug-ReLoader
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        start_background_collector(app, get_pico_data, interval=10)
 
     # Starte lokalen Server
     app.run(host="127.0.0.1", port=5001, debug=True)

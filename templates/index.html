@@ -13,20 +13,39 @@
 
     <div class="card">
         <h2>Temperature</h2>
-        <p>{{ data.temperature }} °C</p>
+        <p id="temp-value">{{ data.temperature }} °C</p>
     </div>
 
     <div class="card">
         <h2>Humidity</h2>
-        <p>{{ data.humidity }} %</p>
+        <p id="hum-value">{{ data.humidity }} %</p>
     </div>
 
     <div class="card">
         <h2>Pressure</h2>
-        <p>{{ data.pressure }} hPa</p>
+        <p id="press-value">{{ data.pressure }} hPa</p>
     </div>
 
 </div>
+
+
+<h2>Last 10 Measurements</h2>
+
+<table id="history-table" style="margin: 40px auto; border-collapse: collapse; width: 80%;">
+    <thead>
+        <tr>
+            <th style="padding: 10px; border-bottom: 2px solid gray;">Time</th>
+            <th style="padding: 10px; border-bottom: 2px solid gray;">Temperature</th>
+            <th style="padding: 10px; border-bottom: 2px solid gray;">Humidity</th>
+            <th style="padding: 10px; border-bottom: 2px solid gray;">Pressure</th>
+        </tr>
+    </thead>
+    <tbody id="history-body">
+        <!-- JS füllt das -->
+    </tbody>
+</table>
+
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
 
 </body>
 </html>
