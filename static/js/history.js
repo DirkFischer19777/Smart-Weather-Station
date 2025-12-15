@@ -35,15 +35,17 @@ async function refreshCurrent() {
 }
 
 // -----------------------------------------
-// Alles aktualisieren
+// Intervall für Live-Werte → alle 10 Sekunden
 // -----------------------------------------
-async function refreshAll() {
-    loadHistory();     // Tabelle aktualisieren
-    refreshCurrent();  // Live-Werte aktualisieren
-}
+setInterval(refreshCurrent, 10000);
 
 // -----------------------------------------
-// Intervall & Initiale Aktualisierung
+// Intervall für History-Tabelle → alle 60 Sekunden
 // -----------------------------------------
-setInterval(refreshAll, 10000);
-refreshAll();
+setInterval(loadHistory, 60000);
+
+// -----------------------------------------
+// Initiales Laden beim Start
+// -----------------------------------------
+refreshCurrent();
+loadHistory();

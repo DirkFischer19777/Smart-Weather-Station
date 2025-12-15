@@ -129,7 +129,7 @@ def api_current():
 if __name__ == "__main__":
     # Nur starten, wenn NICHT im Debug-ReLoader
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        start_background_collector(app, get_pico_data, interval=10)
+        start_background_collector(app, get_pico_data, interval=300)
 
     # Starte lokalen Server
     app.run(host="127.0.0.1", port=5001, debug=True)
