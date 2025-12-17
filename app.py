@@ -123,6 +123,15 @@ def api_current():
         "pressure": data["pressure"]
     }
 
+@app.route("/api/analyze")
+def api_analyze():
+    from ki_processor import analyze_weather
+
+    try:
+        result = analyze_weather()
+        return {"result": result}
+    except Exception as e:
+        return {"result": f"Fehler bei der KI-Analyse: {e}"}
 
 
 # ------------------- MAIN ENTRY -------------------

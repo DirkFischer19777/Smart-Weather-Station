@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from data_models import db, Weather
 from openai import OpenAI
+from flask import current_app
 
 load_dotenv()
 
@@ -44,30 +45,25 @@ def prepare_prompt(entries):
     return text
 
 
-def analyze_weather():
-    print("[DEBUG] Loading last 10 entries...")
+from flask import current_app
 
-    last_entries_raw = get_last_weather(300)
-    print("[DEBUG] Raw DB entries:", last_entries_raw)
+def analyze_weather():
+    with current_app.app_context():
+        last_entries_raw = get_last_weather(300)
 
     last_entries = [format_weather_entry(e) for e in last_entries_raw]
-    print("[DEBUG] Formatted entries:", last_entries)
 
     if not last_entries:
         return "No weather data found in database."
 
     prompt = prepare_prompt(last_entries)
-    print("[DEBUG] Prompt sent to KI:\n", prompt)
 
     response = client.chat.completions.create(
         model="gpt-5-mini",
         messages=[
             {"role": "system", "content": "You are a weather analysis assistant."},
             {"role": "user", "content": prompt}
-        ],
-        # max_completion_tokens=150
+        ]
     )
-
-    print("[DEBUG] Raw API response:", response)
 
     return response.choices[0].message.content.strip()

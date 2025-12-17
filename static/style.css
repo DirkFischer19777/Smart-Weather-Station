@@ -35,3 +35,26 @@ h1 {
     margin: 0;
     font-weight: bold;
 }
+
+#analyze-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+#analyze-btn:hover {
+    background: #45a049;
+}
+
+#ki-result {
+    margin-top: 25px;
+    background: #222;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: left;
+    line-height: 1.6;
+}
