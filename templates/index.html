@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Pico Weather Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -28,7 +29,6 @@
 
 </div>
 
-
 <h2>Last 10 Measurements</h2>
 
 <table id="history-table" style="margin: 40px auto; border-collapse: collapse; width: 80%;">
@@ -40,10 +40,15 @@
             <th style="padding: 10px; border-bottom: 2px solid gray;">Pressure</th>
         </tr>
     </thead>
-    <tbody id="history-body">
-        <!-- JS füllt das -->
-    </tbody>
+    <tbody id="history-body"></tbody>
 </table>
+
+<!-- 🔥 Neuer Bereich für den 24h Graph -->
+<h2>Temperature / Humidity / Pressure – Last 24 Hours</h2>
+
+<div style="width: 80%; margin: 0 auto;">
+    <canvas id="weatherChart"></canvas>
+</div>
 
 <div style="text-align: center; margin: 30px 0;">
     <button id="analyze-btn">Analyze Data & Forecast</button>
@@ -53,6 +58,7 @@
 
 <script src="{{ url_for('static', filename='js/history.js') }}"></script>
 <script src="{{ url_for('static', filename='js/ki.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 
 </body>
 </html>

@@ -3,6 +3,8 @@ import requests
 import time
 from data_models import db, start_background_collector
 import os
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 
@@ -133,6 +135,30 @@ def api_analyze():
     except Exception as e:
         return {"result": f"Fehler bei der KI-Analyse: {e}"}
 
+@app.route("/api/history/24h")
+def api_history_24h():
+    from data_models import Weather
+
+    since = datetime.utcnow() - timedelta(hours=24)
+
+    rows = (
+        Weather.query
+        .filter(Weather.timestamp >= since)
+        .order_by(Weather.timestamp.asc())
+        .all()
+    )
+
+    return {
+        "history": [
+            {
+                "timestamp": row.timestamp.strftime("%H:%M"),
+                "temperature": row.temperature,
+                "humidity": row.humidity,
+                "pressure": row.pressure
+            }
+            for row in rows
+        ]
+    }
 
 # ------------------- MAIN ENTRY -------------------
 if __name__ == "__main__":
