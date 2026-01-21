@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Pico Weather Dashboard</title>
+
+    <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <h1>Pico W Weather Dashboard</h1>
 
+<!-- ================= CURRENT VALUES ================= -->
 <div class="container">
 
     <div class="card">
@@ -29,6 +34,7 @@
 
 </div>
 
+<!-- ================= LAST 10 VALUES TABLE ================= -->
 <h2>Last 10 Measurements</h2>
 
 <table id="history-table" style="margin: 40px auto; border-collapse: collapse; width: 80%;">
@@ -40,25 +46,46 @@
             <th style="padding: 10px; border-bottom: 2px solid gray;">Pressure</th>
         </tr>
     </thead>
-    <tbody id="history-body"></tbody>
+    <tbody id="history-body">
+        <!-- wird durch history.js gefüllt -->
+    </tbody>
 </table>
 
-<!-- 🔥 Neuer Bereich für den 24h Graph -->
-<h2>Temperature / Humidity / Pressure – Last 24 Hours</h2>
+<!-- ================= 24H GRAPHS ================= -->
+<h2>Weather – Last 24 Hours</h2>
 
 <div style="width: 80%; margin: 0 auto;">
-    <canvas id="weatherChart"></canvas>
+
+    <div style="margin-bottom: 40px;">
+        <h3>Temperature (°C)</h3>
+        <canvas id="tempChart"></canvas>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+        <h3>Humidity (%)</h3>
+        <canvas id="humChart"></canvas>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+        <h3>Pressure (hPa)</h3>
+        <canvas id="pressChart"></canvas>
+    </div>
+
 </div>
 
+<!-- ================= KI ANALYSE ================= -->
 <div style="text-align: center; margin: 30px 0;">
     <button id="analyze-btn">Analyze Data & Forecast</button>
 </div>
 
-<div id="ki-result" style="max-width: 80%; margin: 0 auto; white-space: pre-line;"></div>
+<div id="ki-result"
+     style="max-width: 80%; margin: 0 auto; white-space: pre-line;">
+</div>
 
+<!-- ================= SCRIPTS ================= -->
 <script src="{{ url_for('static', filename='js/history.js') }}"></script>
-<script src="{{ url_for('static', filename='js/ki.js') }}"></script>
 <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ki.js') }}"></script>
 
 </body>
 </html>

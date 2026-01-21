@@ -1,10 +1,19 @@
-let weatherChart = null;
+// ================================
+// Globale Chart-Referenzen
+// ================================
+let tempChart = null;
+let humChart = null;
+let pressChart = null;
 
-async function loadWeatherChart() {
+// ================================
+// 24h Wetterdaten laden
+// ================================
+async function loadWeatherCharts() {
     const res = await fetch("/api/history/24h");
     const data = await res.json();
 
     if (!data.history || data.history.length === 0) {
+        console.warn("No 24h weather data available");
         return;
     }
 
@@ -13,41 +22,43 @@ async function loadWeatherChart() {
     const humidity = data.history.map(r => r.humidity);
     const pressure = data.history.map(r => r.pressure);
 
-    const ctx = document.getElementById("weatherChart").getContext("2d");
+    drawTemperatureChart(labels, temperatures);
+    drawHumidityChart(labels, humidity);
+    drawPressureChart(labels, pressure);
+}
 
-    if (weatherChart) {
-        weatherChart.destroy();
-    }
+// ================================
+// Temperatur-Chart (ROT)
+// ================================
+function drawTemperatureChart(labels, data) {
+    const ctx = document.getElementById("tempChart").getContext("2d");
 
-    weatherChart = new Chart(ctx, {
+    if (tempChart) tempChart.destroy();
+
+    tempChart = new Chart(ctx, {
         type: "line",
         data: {
             labels,
-            datasets: [
-                {
-                    label: "Temperature (°C)",
-                    data: temperatures,
-                    tension: 0.3
-                },
-                {
-                    label: "Humidity (%)",
-                    data: humidity,
-                    tension: 0.3
-                },
-                {
-                    label: "Pressure (hPa)",
-                    data: pressure,
-                    tension: 0.3
-                }
-            ]
+            datasets: [{
+                label: "Temperature (°C)",
+                data,
+                borderColor: "rgb(220, 53, 69)",       // Rot
+                backgroundColor: "rgba(220, 53, 69, 0.1)",
+                pointRadius: 2,
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+            }]
         },
         options: {
             responsive: true,
-            interaction: {
-                mode: "index",
-                intersect: false
-            },
             scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: "°C"
+                    }
+                },
                 x: {
                     ticks: {
                         maxTicksLimit: 12
@@ -58,5 +69,94 @@ async function loadWeatherChart() {
     });
 }
 
-loadWeatherChart();
-setInterval(loadWeatherChart, 60000);
+// ================================
+// Luftfeuchtigkeit-Chart (BLAU)
+// ================================
+function drawHumidityChart(labels, data) {
+    const ctx = document.getElementById("humChart").getContext("2d");
+
+    if (humChart) humChart.destroy();
+
+    humChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Humidity (%)",
+                data,
+                borderColor: "rgb(13, 110, 253)",       // Blau
+                backgroundColor: "rgba(13, 110, 253, 0.1)",
+                pointRadius: 2,
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: "%"
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 12
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ================================
+// Luftdruck-Chart (GRÜN)
+// ================================
+function drawPressureChart(labels, data) {
+    const ctx = document.getElementById("pressChart").getContext("2d");
+
+    if (pressChart) pressChart.destroy();
+
+    pressChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Pressure (hPa)",
+                data,
+                borderColor: "rgb(25, 135, 84)",        // Grün
+                backgroundColor: "rgba(25, 135, 84, 0.1)",
+                pointRadius: 2,
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: "hPa"
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 12
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ================================
+// Initialisierung & Intervall
+// ================================
+loadWeatherCharts();
+setInterval(loadWeatherCharts, 60000);
