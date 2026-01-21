@@ -25,6 +25,14 @@ class Weather(db.Model):
     def __repr__(self):
         return f"<Weather {self.timestamp} T={self.temperature} H={self.humidity} P={self.pressure}>"
 
+class AIAnalysis(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    model = db.Column(db.String(50))
+    prompt = db.Column(db.Text)
+    response = db.Column(db.Text)
+    data_points = db.Column(db.Integer)
 
 # -----------------------------
 # STORE DATA FUNCTION
